@@ -1,13 +1,11 @@
 package tn.esprit.nejd_bedoui_project_4twin7.Models;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,4 +21,6 @@ public class Etudiant implements Serializable {
     private String ecole;
     private Date dateNaissance;
 
+    @ManyToMany(mappedBy = "etudiants")
+    private Set<Reservation> reservations;
 }

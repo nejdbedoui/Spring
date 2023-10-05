@@ -1,13 +1,11 @@
 package tn.esprit.nejd_bedoui_project_4twin7.Models;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,4 +18,9 @@ public class Reservation implements Serializable {
     private Date anneeUniversitaire;
     private Boolean estValide;
 
+    @ManyToOne
+    private Chambre chamber;
+
+    @ManyToMany
+    private Set<Etudiant> etudiants;
 }
