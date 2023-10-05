@@ -22,4 +22,5 @@ public class Chambre implements Serializable {
 
     @OneToMany(mappedBy = "chamber")
     private Set<Reservation> reservations;
+
 }
