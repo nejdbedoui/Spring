@@ -1,49 +1,64 @@
 package tn.esprit.nejd_bedoui_project_4twin7.Services.Impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.nejd_bedoui_project_4twin7.Models.Bloc;
+import tn.esprit.nejd_bedoui_project_4twin7.Models.Chambre;
+import tn.esprit.nejd_bedoui_project_4twin7.Models.Foyer;
 import tn.esprit.nejd_bedoui_project_4twin7.Repository.IBlocRepository;
+import tn.esprit.nejd_bedoui_project_4twin7.Repository.IChambreRepository;
+import tn.esprit.nejd_bedoui_project_4twin7.Repository.IFoyerRepository;
 import tn.esprit.nejd_bedoui_project_4twin7.Services.IBlocService;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class IBlocServiceImpl implements IBlocService {
-    @Autowired
-    IBlocRepository iBlocRepository;
+    IFoyerRepository foyerRepository;
+    IBlocRepository blocRepository;
+    IChambreRepository chambreRepository;
     @Override
-    public List<Bloc> retrieveBlocs() {
-        return iBlocRepository.findAll();
+    public Bloc AjouterBloc(Bloc b) {
+        return blocRepository.save(b) ;
     }
 
     @Override
-    public Bloc updateBloc(Bloc bloc) {
-        Bloc bloc1=iBlocRepository.findById(bloc.getIdBloc()).orElse(null);
-        if(bloc1!=null){
-            bloc1.setCapaciteBloc(bloc.getCapaciteBloc());
-            bloc1.setNomBloc(bloc.getNomBloc()==null ? bloc1.getNomBloc() : bloc.getNomBloc());
-            bloc1.setChambres(bloc.getChambres() == null ? bloc1.getChambres() : bloc.getChambres());
-            bloc1.setFoyer(bloc.getFoyer() == null ? bloc1.getFoyer() : bloc.getFoyer());
-            return iBlocRepository.save(bloc1);
+    public Bloc UpdateBloc(Bloc b) {
+        return blocRepository.save(b);
+    }
+
+    @Override
+    public void SupprimerBloc(long idBloc) {
+        blocRepository.deleteById(idBloc);
+    }
+
+    @Override
+    public Bloc GetBloc(long idBloc) {
+        return blocRepository.findById(idBloc).orElse(null);
+    }
+
+    @Override
+    public List<Bloc> GetAllBlocs() {
+        return blocRepository.findAll();
+    }
+    @Transactional
+    @Override
+    public Bloc affecterChambresABloc(List<Long> numChambre, String nomBloc) {
+        Bloc b = blocRepository.findByNomBloc(nomBloc);
+        for(Long id : numChambre){
+            Chambre c = chambreRepository.findById(id).orElse(null);
+            c.setBlocChambre(b);
         }
-        return null;
+        return b;
     }
-
+    @Transactional
     @Override
-    public Bloc addBloc(Bloc bloc) {
-        return iBlocRepository.save(bloc);
-    }
-
-    @Override
-    public Bloc retrieveBloc(long idBloc) {
-        return iBlocRepository.findById(idBloc).orElse(null);
-    }
-
-    @Override
-    public void removeBloc(long idBloc) {
-        Bloc bloc=iBlocRepository.findById(idBloc).orElse(null);
-        if(bloc!=null)
-        iBlocRepository.delete(bloc);
+    public Bloc affecterBlocAFoyer(String nomBloc, String nomFoyer) {
+        Bloc b = blocRepository.findByNomBloc(nomBloc);
+        Foyer f = foyerRepository.findByNomFoyer(nomFoyer);
+        b.setFoyer(f);
+        return b;
     }
 }
