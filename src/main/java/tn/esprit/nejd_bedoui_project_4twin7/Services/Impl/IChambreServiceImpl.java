@@ -1,7 +1,6 @@
 package tn.esprit.nejd_bedoui_project_4twin7.Services.Impl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.nejd_bedoui_project_4twin7.Models.Bloc;
 import tn.esprit.nejd_bedoui_project_4twin7.Models.Chambre;
@@ -87,6 +86,13 @@ public class IChambreServiceImpl implements IChambreService {
 
 
         return chambre;
+    }
+
+    @Override
+    public List<Chambre> getChambresParBlocEtType(long idBloc, TypeChambre typeC) {
+        Bloc b = blocRepository.findById(idBloc).orElse(null);
+        return chambreRepository.findByBlocChambreAndTypeC(b,typeC);
+       // return  chambreRepository.findByBlocAndTypeChambre(b,typeC);
     }
 
 

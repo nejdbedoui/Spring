@@ -20,6 +20,6 @@ public class Chambre implements Serializable {
     @ManyToOne
     private Bloc blocChambre;
 
-    @OneToMany(mappedBy = "chamber")
+    @OneToMany
     private Set<Reservation> reservations;
 }

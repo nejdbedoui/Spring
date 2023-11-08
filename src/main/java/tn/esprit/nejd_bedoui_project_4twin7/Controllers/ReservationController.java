@@ -46,4 +46,10 @@ public class ReservationController {
         return reservationService.ajouterReservation(id,cin);
 }
 
+    @DeleteMapping ("annulerReservation/{cin_etudiant}")
+    public Reservation annulerReservation( @PathVariable long cin_etudiant)
+    {
+        return reservationService.annulerReservation(cin_etudiant);
+    }
+
 }

@@ -29,8 +29,6 @@ public class Reservation implements Serializable {
     private Date anneeUniversitaire;
     private Boolean estValide;
 
-    @ManyToOne
-    private Chambre chamber;
 
     @ManyToMany
     private Set<Etudiant> etudiants;

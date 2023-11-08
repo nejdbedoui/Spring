@@ -1,5 +1,6 @@
 package tn.esprit.nejd_bedoui_project_4twin7.Services;
 
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.nejd_bedoui_project_4twin7.Models.Reservation;
 
 import java.util.Date;
@@ -15,4 +16,7 @@ public interface IReservationService {
             numChambre, Long cin) ;
     long getReservationParAnneeUniversitaire(Date debutAnnee, Date finAnnee ) ;
     public Reservation ajouterReservation (long idChambre, long cinEtudiant) ;
+
+    @Transactional
+    Reservation annulerReservation(long cinEtudiant);
 }

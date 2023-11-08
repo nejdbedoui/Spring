@@ -1,7 +1,6 @@
 package tn.esprit.nejd_bedoui_project_4twin7.Services.Impl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.nejd_bedoui_project_4twin7.Models.Chambre;
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @AllArgsConstructor
@@ -56,7 +54,11 @@ public class IReservationServiceImpl implements IReservationService {
     @Transactional
     public Reservation ajouterReservationEtAssignerAChambreEtAEtudiant(Reservation res, Long numChambre, Long cin) {
         Reservation resrvation = resrvationRepository.findById(res.getIdReservation()).orElse(null);
-        resrvation.setChamber(chambreRepository.findById(numChambre).orElse(null));
+        Chambre ch=chambreRepository.findById(numChambre).orElse(null);
+        if(ch.getReservations()==null){
+            ch.setReservations(new HashSet<>());
+        }
+        ch.getReservations().add(resrvation);
         resrvation.getEtudiants().add(etudiantRepository.findEtudiantByCin(cin));
         return resrvation;
     }
@@ -73,34 +75,54 @@ public class IReservationServiceImpl implements IReservationService {
         Etudiant et = etudiantRepository.findEtudiantByCin(cinEtudiant);
         Reservation r = new Reservation();
         r.setNumReservation(ch.getNumeroChambre()+"-"+ch.getBlocChambre().getNomBloc()+"-"+cinEtudiant);
-        r.setNumReservation(ch.getNumeroChambre() + ch.getBlocChambre().getNomBloc() + cinEtudiant);
         r.setDebuteAnneUniversite(LocalDate.parse(LocalDate.now().getYear() + "-09-01"));
         r.setFinAnneUniversite(LocalDate.parse((LocalDate.now().getYear() + 1) + "-06-01"));
         r.setEstValide(true);
-        int c=resrvationRepository.findByChamber(ch).size();
+        int c=ch.getReservations().size();
         if(r.getEtudiants()==null){
             r.setEtudiants(new HashSet<>());
         }
+        if(ch.getReservations()==null){
+            ch.setReservations(new HashSet<>());
+        }
         if(ch.getTypeC()==TypeChambre.Simple && c<1 ){
-            r.setChamber(ch);
-            r.getEtudiants().add(et);
             r=resrvationRepository.save(r);
-
+            ch.getReservations().add(r);
+            r.getEtudiants().add(et);
+            chambreRepository.save(ch);
+            return r;
         }
 
         if(ch.getTypeC()==TypeChambre.Double && c<2 ){
-            r.setChamber(ch);
+            r=resrvationRepository.save(r);
+            ch.getReservations().add(r);
+            r.getEtudiants().add(et);
+            chambreRepository.save(ch);
+            return r;
+        }
+        if(ch.getTypeC()==TypeChambre.Triple && c<3 ){
             r.getEtudiants().add(et);
             r=resrvationRepository.save(r);
-
-        }
-        if(ch.getTypeC()==TypeChambre.Simple && c<3 ){
-            r.setChamber(ch);
-            r.getEtudiants().add(et);
-            r=resrvationRepository.save(r);
+            ch.getReservations().add(r);
+            chambreRepository.save(ch);
+            return r;
         }
 
-        return r;
+        return null;
     }
 
+    @Transactional
+    @Override
+    public Reservation annulerReservation(long cinEtudiant) {
+        Etudiant e =etudiantRepository.findEtudiantByCin(cinEtudiant);
+        List<Reservation> r = resrvationRepository.findByEtudiants(e);
+        for(Reservation re:r) {
+            Chambre ch = chambreRepository.findChambreByReservations(re);
+            ch.getReservations().remove(re);
+            re.getEtudiants().remove(e);
+            re.setEstValide(false);
+            resrvationRepository.save(re);
+        }
+        return null;
+    }
 }
